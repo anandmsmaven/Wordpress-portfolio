@@ -135,30 +135,23 @@ class Services_JSON
     *                                   bubble up with an error, so all return values
     *                                   from encode() should be checked with isError()
     *                           - SERVICES_JSON_USE_TO_JSON:  call toJSON when serializing objects
-    *                                   It serializes the return value from the toJSON call rather
-    *                                   than the object itself, toJSON can return associative arrays,
+    *                                   It serializes the return value from the toJSON call rather 
+    *                                   than the object it'self,  toJSON can return associative arrays, 
     *                                   strings or numbers, if you return an object, make sure it does
     *                                   not have a toJSON method, otherwise an error will occur.
     */
-    function __construct( $use = 0 )
+    function Services_JSON($use = 0)
     {
         $this->use = $use;
         $this->_mb_strlen            = function_exists('mb_strlen');
         $this->_mb_convert_encoding  = function_exists('mb_convert_encoding');
         $this->_mb_substr            = function_exists('mb_substr');
     }
-
-	/**
-	 * PHP4 constructor.
-	 */
-	public function Services_JSON( $use = 0 ) {
-		self::__construct( $use );
-	}
     // private - cache the mbstring lookup results..
     var $_mb_strlen = false;
     var $_mb_substr = false;
     var $_mb_convert_encoding = false;
-
+    
    /**
     * convert a string from one UTF-16 char to one UTF-8 char
     *
@@ -282,10 +275,10 @@ class Services_JSON
         $ret = $this->_encode($var);
         setlocale(LC_NUMERIC, $lc);
         return $ret;
-
+        
     }
     /**
-    * PRIVATE CODE that does the work of encodes an arbitrary variable into JSON format
+    * PRIVATE CODE that does the work of encodes an arbitrary variable into JSON format 
     *
     * @param    mixed   $var    any number, boolean, string, array, or object to be encoded.
     *                           see argument 1 to Services_JSON() above for array-parsing behavior.
@@ -295,9 +288,9 @@ class Services_JSON
     * @return   mixed   JSON string representation of input var or an error if a problem occurs
     * @access   public
     */
-    function _encode($var)
+    function _encode($var) 
     {
-
+         
         switch (gettype($var)) {
             case 'boolean':
                 return $var ? 'true' : 'false';
@@ -362,7 +355,7 @@ class Services_JSON
                                 $ascii .= '?';
                                 break;
                             }
-
+                            
                             $char = pack('C*', $ord_var_c, ord($var{$c + 1}));
                             $c += 1;
                             $utf16 = $this->utf82utf16($char);
@@ -445,7 +438,7 @@ class Services_JSON
             case 'array':
                /*
                 * As per JSON spec if any array key is not an integer
-                * we must treat the whole array as an object. We
+                * we must treat the the whole array as an object. We
                 * also try to catch a sparsely populated associative
                 * array with numeric keys here because some JS engines
                 * will create an array with empty indexes up to
@@ -488,27 +481,27 @@ class Services_JSON
                 return '[' . join(',', $elements) . ']';
 
             case 'object':
-
+            
                 // support toJSON methods.
                 if (($this->use & SERVICES_JSON_USE_TO_JSON) && method_exists($var, 'toJSON')) {
                     // this may end up allowing unlimited recursion
                     // so we check the return value to make sure it's not got the same method.
                     $recode = $var->toJSON();
-
+                    
                     if (method_exists($recode, 'toJSON')) {
-
+                        
                         return ($this->use & SERVICES_JSON_SUPPRESS_ERRORS)
                         ? 'null'
                         : new Services_JSON_Error(get_class($var).
                             " toJSON returned an object with a toJSON method.");
-
+                            
                     }
-
+                    
                     return $this->_encode( $recode );
-                }
-
+                } 
+                
                 $vars = get_object_vars($var);
-
+                
                 $properties = array_map(array($this, 'name_value'),
                                         array_keys($vars),
                                         array_values($vars));
@@ -772,7 +765,7 @@ class Services_JSON
                                 // element in an associative array,
                                 // for now
                                 $parts = array();
-
+                                
                                if (preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:/Uis', $slice, $parts)) {
  	                              // "name":value pair
                                     $key = $this->decode($parts[1]);
@@ -879,28 +872,28 @@ class Services_JSON
 
         return false;
     }
-
+    
     /**
     * Calculates length of string in bytes
-    * @param string
+    * @param string 
     * @return integer length
     */
-    function strlen8( $str )
+    function strlen8( $str ) 
     {
         if ( $this->_mb_strlen ) {
             return mb_strlen( $str, "8bit" );
         }
         return strlen( $str );
     }
-
+    
     /**
     * Returns part of a string, interpreting $start and $length as number of bytes.
-    * @param string
-    * @param integer start
-    * @param integer length
+    * @param string 
+    * @param integer start 
+    * @param integer length 
     * @return integer length
     */
-    function substr8( $string, $start, $length=false )
+    function substr8( $string, $start, $length=false ) 
     {
         if ( $length === false ) {
             $length = $this->strlen8( $string ) - $start;
@@ -917,17 +910,11 @@ if (class_exists('PEAR_Error')) {
 
     class Services_JSON_Error extends PEAR_Error
     {
-        function __construct($message = 'unknown error', $code = null,
+        function Services_JSON_Error($message = 'unknown error', $code = null,
                                      $mode = null, $options = null, $userinfo = null)
         {
             parent::PEAR_Error($message, $code, $mode, $options, $userinfo);
         }
-
-	public function Services_JSON_Error($message = 'unknown error', $code = null,
-                                     $mode = null, $options = null, $userinfo = null) {
-		self::__construct($message = 'unknown error', $code = null,
-                                     $mode = null, $options = null, $userinfo = null);
-	}
     }
 
 } else {
@@ -937,24 +924,13 @@ if (class_exists('PEAR_Error')) {
      */
     class Services_JSON_Error
     {
-	    /**
-	     * PHP5 constructor.
-	     */
-        function __construct( $message = 'unknown error', $code = null,
-                                     $mode = null, $options = null, $userinfo = null )
+        function Services_JSON_Error($message = 'unknown error', $code = null,
+                                     $mode = null, $options = null, $userinfo = null)
         {
 
         }
-
-	    /**
-	     * PHP4 constructor.
-	     */
-		public function Services_JSON_Error( $message = 'unknown error', $code = null,
-	                                     $mode = null, $options = null, $userinfo = null ) {
-			self::__construct( $message, $code, $mode, $options, $userinfo );
-		}
     }
-
+    
 }
 
 endif;
